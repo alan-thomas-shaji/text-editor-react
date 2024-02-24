@@ -24,7 +24,11 @@ const TextEditor = () => {
       },
       BOLD: {
         fontWeight: "bold",
-    },
+      },
+      HEADING: {
+          fontSize: "2rem",
+          fontWeight: "bold",
+      },
   };
 
   const keyBindingFn = useCallback(
@@ -72,7 +76,7 @@ const TextEditor = () => {
           newContentState,
           "remove-range"
         );
-        newState = RichUtils.toggleBlockType(newState, "header-one");
+        newState = RichUtils.toggleInlineStyle(newState, "HEADING");
       } else if (command === "apply-underline") {
           const contentState = editorState.getCurrentContent();
           const selection = editorState.getSelection();
