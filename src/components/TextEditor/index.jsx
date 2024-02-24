@@ -14,32 +14,36 @@ const TextEditor = () => {
   );
   const editor = React.useRef(null);
 
+  const styleMap = {
+    REDLINE: {
+      color: "red",
+      fontWeight: "bold",
+    },
+    UNDERLINE: {
+      textDecoration: "underline",
+      },
+      BOLD: {
+        fontWeight: "bold",
+    },
+  };
+
   const keyBindingFn = useCallback(
     (event) => {
       const contentState = editorState.getCurrentContent();
       const selection = editorState.getSelection();
       const currentBlock = contentState.getBlockForKey(selection.getStartKey());
-          const currentText = currentBlock.getText();
-          console.log("current text: " + currentText);
-        //   console.log("content state: " + contentState);
-
-      // Check for "#" followed by space at the beginning of the line
-      if (
-          event.keyCode === 32
-          &&
-        currentText.startsWith("#")
-        //  &&
-        // selection.getStartOffset() === 2
-      ) {
+      const currentText = currentBlock.getText();
+      console.log("current text: " + currentText);
+      if (event.keyCode === 32 && currentText.startsWith("#")) {
         return "apply-heading";
       } else if (event.keyCode === 32 && currentText.startsWith("***")) {
-          return "apply-underline";
+        return "apply-underline";
+      } else if (event.keyCode === 32 && currentText.startsWith("**")) {
+        return "redline";
+      } else if (event.keyCode === 32 && currentText.startsWith("*")) {
+        return "apply-bold";
       }
-    //   else if (event.keyCode === 13) {
-    //       return "apply-heading";
-    //   } 
       return getDefaultKeyBinding(event);
-        //   return getDefaultKeyBinding("");
     },
     [editorState]
   );
@@ -63,8 +67,6 @@ const TextEditor = () => {
           }),
           ""
         );
-
-        // Apply heading style
         newState = EditorState.push(
           editorState,
           newContentState,
@@ -72,56 +74,66 @@ const TextEditor = () => {
         );
         newState = RichUtils.toggleBlockType(newState, "header-one");
       } else if (command === "apply-underline") {
+          const contentState = editorState.getCurrentContent();
+          const selection = editorState.getSelection();
+          const newContentState = Modifier.replaceText(
+            contentState,
+            selection.merge({
+              anchorOffset: 0,
+              focusOffset: 3,
+            }),
+            ""
+          );
+          newState = EditorState.push(
+            editorState,
+            newContentState,
+            "remove-range"
+          );
+          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
+      } else if (command === "new-line") {
         const contentState = editorState.getCurrentContent();
         const selection = editorState.getSelection();
         const currentBlock = contentState.getBlockForKey(
           selection.getStartKey()
         );
-
-        // Remove "#" and space
+        newState = EditorState;
+        newState = RichUtils.toggleBlockType(newState, "heading-one");
+      } else if (command === "redline") {
+        const contentState = editorState.getCurrentContent();
+        const selection = editorState.getSelection();
         const newContentState = Modifier.replaceText(
           contentState,
           selection.merge({
             anchorOffset: 0,
-            focusOffset: 4,
+            focusOffset: 3,
           }),
           ""
         );
-
-        // Apply heading style
-        // newState = EditorState.push(
-        //   editorState,
-        //   newContentState,
-        //   "underline"
-        // );
-          // newState = RichUtils.toggleBlockType(newState, "underline");
-          newState = RichUtils.toggleInlineStyle(
-            editorState,
-            "UNDERLINE"
-          );
-      }
-      else if (command === "new-line") {
+        newState = EditorState.push(
+          editorState,
+          newContentState,
+          "remove-range"
+        );
+        newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
+      } else if (command === "apply-bold") {
         const contentState = editorState.getCurrentContent();
         const selection = editorState.getSelection();
-        const currentBlock = contentState.getBlockForKey(
-          selection.getStartKey()
+        const newContentState = Modifier.replaceText(
+          contentState,
+          selection.merge({
+            anchorOffset: 0,
+            focusOffset: 2,
+          }),
+          ""
         );
-
-        // Remove "#" and space
-        // const newContentState = Modifier.replaceText(
-        //   contentState,
-        //   selection.merge({
-        //     anchorOffset: 0,
-        //     focusOffset: 2,
-        //   }),
-        //   ""
-        // );
-
-        // Apply heading style
-        newState = EditorState;
-        newState = RichUtils.toggleBlockType(newState, "heading-one");
+        newState = EditorState.push(
+            editorState,
+            
+          newContentState,
+          "remove-range"
+        );
+        newState = RichUtils.toggleInlineStyle(newState, "BOLD");
       }
-    
 
       if (newState) {
         setEditorState(newState);
@@ -140,6 +152,7 @@ const TextEditor = () => {
       placeholder="Write something!"
       handleKeyCommand={handleKeyCommand}
       keyBindingFn={keyBindingFn}
+      customStyleMap={styleMap}
     />
   );
 };
