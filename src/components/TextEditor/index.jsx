@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Editor,
   EditorState,
@@ -83,18 +83,22 @@ const TextEditor = () => {
           contentState,
           selection.merge({
             anchorOffset: 0,
-            focusOffset: 3,
+            focusOffset: 4,
           }),
           ""
         );
 
         // Apply heading style
-        newState = EditorState.push(
-          editorState,
-          newContentState,
-          "underline"
-        );
-        newState = RichUtils.toggleBlockType(newState, "underline");
+        // newState = EditorState.push(
+        //   editorState,
+        //   newContentState,
+        //   "underline"
+        // );
+          // newState = RichUtils.toggleBlockType(newState, "underline");
+          newState = RichUtils.toggleInlineStyle(
+            editorState,
+            "UNDERLINE"
+          );
       }
       else if (command === "new-line") {
         const contentState = editorState.getCurrentContent();
