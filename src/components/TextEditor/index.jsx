@@ -9,8 +9,6 @@ import {
   CharacterMetadata,
 } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { removeInlineStyle } from "draft-js/lib/DraftModifier";
-import { removeStyle } from "draft-js/lib/CharacterMetadata";
 
 const TextEditor = () => {
   const [editorState, setEditorState] = React.useState(() =>
@@ -47,7 +45,6 @@ const TextEditor = () => {
       const selection = editorState.getSelection();
       const currentBlock = contentState.getBlockForKey(selection.getStartKey());
       const currentText = currentBlock.getText();
-      // console.log("current text: " + currentText);
       if (event.keyCode === 32 && currentText.startsWith("#")) {
         return "apply-heading";
       } else if (event.keyCode === 32 && currentText.startsWith("***")) {
@@ -199,8 +196,6 @@ const TextEditor = () => {
         ) {
           newState = RichUtils.toggleInlineStyle(newState, "BOLD");
         }
-
-        // newState = RichUtils.toggleInlineStyle(newState, "RESET_STYLES");
       }
 
       if (newState) {
@@ -211,8 +206,6 @@ const TextEditor = () => {
     },
     [editorState]
   );
-
-  // useEffect(() => {}, [currentText]);
 
   return (
     <Editor
