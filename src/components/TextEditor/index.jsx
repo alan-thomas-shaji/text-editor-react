@@ -17,6 +17,7 @@ import SaveButton from "../SaveButton";
 import { getFromLocalStorage } from "../../utils";
 import { styleMap } from "../../constants";
 import './index.css'
+import Title from "../Title";
 
 const TextEditor = () => {
   const [editorState, setEditorState] = React.useState(() =>
@@ -276,8 +277,8 @@ const TextEditor = () => {
 
   return (
     <>
-          <div className="top-bar">
-              <div className="title">Demo Editor by Alan</div>
+      <div className="top-bar">
+        <Title heading={"Demo Editor by Alan"} />
         <SaveButton contentState={currentContent} />
       </div>
 
