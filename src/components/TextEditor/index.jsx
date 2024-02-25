@@ -6,15 +6,10 @@ import {
   getDefaultKeyBinding,
   Modifier,
   genKey,
-  CharacterMetadata,
   convertFromRaw,
-  ContentState,
 } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { removeInlineStyle } from "draft-js/lib/DraftModifier";
-import { removeStyle } from "draft-js/lib/CharacterMetadata";
 import SaveButton from "../SaveButton";
-import { getFromLocalStorage } from "../../utils";
 import { styleMap } from "../../constants";
 import './index.css'
 import Title from "../Title";
