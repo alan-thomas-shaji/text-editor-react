@@ -7,15 +7,20 @@ import {
   Modifier,
   genKey,
   CharacterMetadata,
+  convertFromRaw,
+  ContentState,
 } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { removeInlineStyle } from "draft-js/lib/DraftModifier";
 import { removeStyle } from "draft-js/lib/CharacterMetadata";
+import SaveButton from "../SaveButton";
+import { getFromLocalStorage } from "../../utils";
 
 const TextEditor = () => {
   const [editorState, setEditorState] = React.useState(() =>
     EditorState.createEmpty()
   );
+    const [currentContent, setCurrentContent] = React.useState({});
   const editor = React.useRef(null);
 
   const styleMap = {
@@ -268,19 +273,41 @@ const TextEditor = () => {
     },
     [editorState]
   );
+    useEffect(() => {
+      const savedContent = localStorage.getItem("contentState");
+      if (savedContent) {
+        try {
+          const parsedContent = JSON.parse(savedContent);
+          const contentState = convertFromRaw({
+            blocks: parsedContent.blocks,
+            entityMap: parsedContent.entityMap,
+          });
+          setEditorState(EditorState.createWithContent(contentState));
+        } catch (error) {
+          console.error("Error parsing saved content state:", error);
+        }
+      }
+    }, []);
 
-  // useEffect(() => {}, [currentText]);
+
+    useEffect(() => {
+        const contentState = editorState.getCurrentContent();
+        setCurrentContent(contentState);
+    },[editorState]);
 
   return (
-    <Editor
-      ref={editor}
-      editorState={editorState}
-      onChange={setEditorState}
-      placeholder="Write something!"
-      handleKeyCommand={handleKeyCommand}
-      keyBindingFn={keyBindingFn}
-      customStyleMap={styleMap}
-    />
+    <>
+      <SaveButton contentState={currentContent} />
+      <Editor
+        ref={editor}
+        editorState={editorState}
+        onChange={setEditorState}
+        placeholder="Write something!"
+        handleKeyCommand={handleKeyCommand}
+        keyBindingFn={keyBindingFn}
+        customStyleMap={styleMap}
+      />
+    </>
   );
 };
 
