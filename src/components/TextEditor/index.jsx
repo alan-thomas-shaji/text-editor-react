@@ -6,8 +6,11 @@ import {
   getDefaultKeyBinding,
   Modifier,
   genKey,
+  CharacterMetadata,
 } from "draft-js";
 import "draft-js/dist/Draft.css";
+import { removeInlineStyle } from "draft-js/lib/DraftModifier";
+import { removeStyle } from "draft-js/lib/CharacterMetadata";
 
 const TextEditor = () => {
   const [editorState, setEditorState] = React.useState(() =>
@@ -44,7 +47,7 @@ const TextEditor = () => {
       const selection = editorState.getSelection();
       const currentBlock = contentState.getBlockForKey(selection.getStartKey());
       const currentText = currentBlock.getText();
-      console.log("current text: " + currentText);
+      // console.log("current text: " + currentText);
       if (event.keyCode === 32 && currentText.startsWith("#")) {
         return "apply-heading";
       } else if (event.keyCode === 32 && currentText.startsWith("***")) {
@@ -64,110 +67,141 @@ const TextEditor = () => {
   const handleKeyCommand = useCallback(
     (command) => {
       let newState;
-          if (command === "apply-heading") {
-              const contentState = editorState.getCurrentContent();
-              const selection = editorState.getSelection();
-              const currentBlock = contentState.getBlockForKey(
-                  selection.getStartKey()
-              );
-              const newContentState = Modifier.replaceText(
-                  contentState,
-                  selection.merge({
-                      anchorOffset: 0,
-                      focusOffset: 2,
-                  }),
-                  ""
-              );
-              newState = EditorState.push(
-                  editorState,
-                  newContentState,
-                  "remove-range"
-              );
-              newState = RichUtils.toggleInlineStyle(newState, "HEADING");
-          } else if (command === "apply-underline") {
-              const contentState = editorState.getCurrentContent();
-              const selection = editorState.getSelection();
-              const newContentState = Modifier.replaceText(
-                  contentState,
-                  selection.merge({
-                      anchorOffset: 0,
-                      focusOffset: 3,
-                  }),
-                  ""
-              );
-              newState = EditorState.push(
-                  editorState,
-                  newContentState,
-                  "remove-range"
-              );
-              newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
-          }
-          else if (command === "redline") {
-              const contentState = editorState.getCurrentContent();
-              const selection = editorState.getSelection();
-              const newContentState = Modifier.replaceText(
-                  contentState,
-                  selection.merge({
-                      anchorOffset: 0,
-                      focusOffset: 3,
-                  }),
-                  ""
-              );
-              newState = EditorState.push(
-                  editorState,
-                  newContentState,
-                  "remove-range"
-              );
-              newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
-          } else if (command === "apply-bold") {
-              const contentState = editorState.getCurrentContent();
-              const selection = editorState.getSelection();
-              const newContentState = Modifier.replaceText(
-                  contentState,
-                  selection.merge({
-                      anchorOffset: 0,
-                      focusOffset: 2,
-                  }),
-                  ""
-              );
-              newState = EditorState.push(
-                  editorState,
+      if (command === "apply-heading") {
+        const contentState = editorState.getCurrentContent();
+        const selection = editorState.getSelection();
+        const currentBlock = contentState.getBlockForKey(
+          selection.getStartKey()
+        );
 
-                  newContentState,
-                  "remove-range"
-              );
-              newState = RichUtils.toggleInlineStyle(newState, "BOLD");
-          } else if (command === "new-line") {
-              const contentState = editorState.getCurrentContent();
-              const selection = editorState.getSelection();
-              const currentBlock = contentState.getBlockForKey(
-                selection.getStartKey()
-              );
+        const newContentState = Modifier.replaceText(
+          contentState,
+          selection.merge({
+            anchorOffset: 0,
+            focusOffset: 2,
+          }),
+          ""
+        );
+        newState = EditorState.push(
+          editorState,
+          newContentState,
+          "remove-range"
+        );
+        newState = RichUtils.toggleInlineStyle(newState, "HEADING");
+      } else if (command === "apply-underline") {
+        const contentState = editorState.getCurrentContent();
+        const selection = editorState.getSelection();
+        const newContentState = Modifier.replaceText(
+          contentState,
+          selection.merge({
+            anchorOffset: 0,
+            focusOffset: 3,
+          }),
+          ""
+        );
+        newState = EditorState.push(
+          editorState,
+          newContentState,
+          "remove-range"
+        );
+        newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
+      } else if (command === "redline") {
+        const contentState = editorState.getCurrentContent();
+        const selection = editorState.getSelection();
+        const newContentState = Modifier.replaceText(
+          contentState,
+          selection.merge({
+            anchorOffset: 0,
+            focusOffset: 3,
+          }),
+          ""
+        );
+        newState = EditorState.push(
+          editorState,
+          newContentState,
+          "remove-range"
+        );
+        newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
+      } else if (command === "apply-bold") {
+        const contentState = editorState.getCurrentContent();
+        const selection = editorState.getSelection();
+        const newContentState = Modifier.replaceText(
+          contentState,
+          selection.merge({
+            anchorOffset: 0,
+            focusOffset: 2,
+          }),
+          ""
+        );
+        newState = EditorState.push(
+          editorState,
 
-              const blockMap = contentState.getBlockMap();
-              const newBlock = currentBlock.merge({
-                text: "",
-                type: "unstyled", // Set the type to unstyled for a new line
-                key: genKey(), // Generate a new key for the new block
-              });
+          newContentState,
+          "remove-range"
+        );
+        newState = RichUtils.toggleInlineStyle(newState, "BOLD");
+      } else if (command === "new-line") {
+        const contentState = editorState.getCurrentContent();
+        const selection = editorState.getSelection();
+        const currentBlock = contentState.getBlockForKey(
+          selection.getStartKey()
+        );
+        console.log(
+          "get inline style: ",
+          JSON.stringify(editorState.getCurrentInlineStyle())
+        );
 
-              const newContentState = contentState.merge({
-                blockMap: blockMap.set(newBlock.key, newBlock),
-                selectionAfter: selection.merge({
-                  anchorKey: newBlock.key,
-                  focusKey: newBlock.key,
-                  anchorOffset: 0,
-                  focusOffset: 0,
-                }),
-              });
+        const blockMap = contentState.getBlockMap();
+        const newBlock = currentBlock.merge({
+          text: "",
+          type: "unstyled", // Set the type to unstyled for a new line
+          key: genKey(), // Generate a new key for the new block
+        });
 
-              newState = EditorState.push(
-                editorState,
-                newContentState,
-                "insert-characters"
-              );
-              newState = RichUtils.toggleInlineStyle(newState, "RESET_STYLES");
-          }
+        const newContentState = contentState.merge({
+          blockMap: blockMap.set(newBlock.key, newBlock),
+          selectionAfter: selection.merge({
+            anchorKey: newBlock.key,
+            focusKey: newBlock.key,
+            anchorOffset: 0,
+            focusOffset: 0,
+          }),
+        });
+
+        newState = EditorState.push(
+          editorState,
+          newContentState,
+          "insert-characters"
+        );
+        if (
+          JSON.stringify(editorState.getCurrentInlineStyle()).includes(
+            "HEADING"
+          )
+        ) {
+          newState = RichUtils.toggleInlineStyle(newState, "HEADING");
+        }
+        if (
+          JSON.stringify(editorState.getCurrentInlineStyle()).includes(
+            "REDLINE"
+          )
+        ) {
+          newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
+        }
+        if (
+          JSON.stringify(editorState.getCurrentInlineStyle()).includes(
+            "UNDERLINE"
+          )
+        ) {
+          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
+        }
+        if (
+          JSON.stringify(editorState.getCurrentInlineStyle()).includes("BOLD")
+        ) {
+          newState = RichUtils.toggleInlineStyle(newState, "BOLD");
+        }
+
+        // newState = RichUtils.toggleInlineStyle(newState, "RESET_STYLES");
+      }
 
       if (newState) {
         setEditorState(newState);
