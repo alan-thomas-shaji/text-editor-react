@@ -15,6 +15,8 @@ import { removeInlineStyle } from "draft-js/lib/DraftModifier";
 import { removeStyle } from "draft-js/lib/CharacterMetadata";
 import SaveButton from "../SaveButton";
 import { getFromLocalStorage } from "../../utils";
+import { styleMap } from "../../constants";
+import './index.css'
 
 const TextEditor = () => {
   const [editorState, setEditorState] = React.useState(() =>
@@ -22,29 +24,6 @@ const TextEditor = () => {
   );
     const [currentContent, setCurrentContent] = React.useState({});
   const editor = React.useRef(null);
-
-  const styleMap = {
-    REDLINE: {
-      color: "red",
-      fontWeight: "bold",
-    },
-    UNDERLINE: {
-      textDecoration: "underline",
-    },
-    BOLD: {
-      fontWeight: "bold",
-    },
-    HEADING: {
-      fontSize: "2rem",
-      fontWeight: "bold",
-    },
-    RESET_STYLES: {
-      color: null,
-      textDecoration: null,
-      fontWeight: null,
-      fontSize: null,
-    },
-  };
 
   const keyBindingFn = useCallback(
     (event) => {
@@ -297,7 +276,11 @@ const TextEditor = () => {
 
   return (
     <>
-      <SaveButton contentState={currentContent} />
+          <div className="top-bar">
+              <div className="title">Demo Editor by Alan</div>
+        <SaveButton contentState={currentContent} />
+      </div>
+
       <Editor
         ref={editor}
         editorState={editorState}

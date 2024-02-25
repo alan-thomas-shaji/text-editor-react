@@ -1,18 +1,11 @@
 import React from "react";
 import { getFromLocalStorage, setLocalStorage } from "../../utils";
 import { convertToRaw } from "draft-js";
+import "./index.css";
 
 const SaveButton = ({ contentState }) => {
-  // const handleSave = () => {
-  //     setLocalStorage("contentState", contentState);
-  //  };
   const handleSave = () => {
-    // const contentState = editorState.getCurrentContent();
-    //  const rawContentState = convertToRaw(contentState);
-    localStorage.setItem(
-      "contentState",
-      JSON.stringify(convertToRaw(contentState))
-    );
+    setLocalStorage("contentState", JSON.stringify(convertToRaw(contentState)));
   };
   return (
     <div>

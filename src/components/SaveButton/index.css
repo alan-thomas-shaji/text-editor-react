@@ -1,0 +1,11 @@
+button {
+    width: 5rem;
+    height: 3rem;
+    border-radius: 10px;
+    border: none;
+    background-color: #eaff96;
+    font-size: 1.5rem;
+}
+button:hover{
+    cursor: pointer;
+}

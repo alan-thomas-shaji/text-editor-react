@@ -15,9 +15,7 @@ export const getFromLocalStorage = (key) => {
 // Function to save data to local storage
 export const setLocalStorage = (key, data) => {
   try {
-    const serializedData = JSON.stringify(data);
-      localStorage.setItem(key, serializedData);
-      localStorage.setItem("saved", true);
+      localStorage.setItem(key, data);
   } catch (error) {
     console.error("Error saving data to local storage:", error);
   }
