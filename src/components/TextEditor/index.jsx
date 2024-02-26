@@ -13,6 +13,7 @@ import SaveButton from "../SaveButton";
 import { styleMap } from "../../constants";
 import './index.css'
 import Title from "../Title";
+import { handleApplyBold, handleApplyHeading, handleApplyNewLine, handleApplyRed, handleApplyUnderline } from "../../utils";
 
 const TextEditor = () => {
   const [editorState, setEditorState] = React.useState(() =>
@@ -49,195 +50,15 @@ const TextEditor = () => {
       let newState;
       let currentEditorState = editorState;
       if (command === "apply-heading") {
-        const contentState = currentEditorState.getCurrentContent();
-        const selection = currentEditorState.getSelection();
-        const currentBlock = contentState.getBlockForKey(
-          selection.getStartKey()
-        );
-
-        const newContentState = Modifier.replaceText(
-          contentState,
-          selection.merge({
-            anchorOffset: 0,
-            focusOffset: 2,
-          }),
-          ""
-        );
-        newState = EditorState.push(
-          currentEditorState,
-          newContentState,
-          "remove-range"
-        );
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("HEADING")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "HEADING");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("REDLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("UNDERLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
-        }
-        if (JSON.stringify(newState.getCurrentInlineStyle()).includes("BOLD")) {
-          newState = RichUtils.toggleInlineStyle(newState, "BOLD");
-        }
-
-        newState = RichUtils.toggleInlineStyle(newState, "HEADING");
+        newState = handleApplyHeading(currentEditorState);
       } else if (command === "apply-underline") {
-        const contentState = currentEditorState.getCurrentContent();
-        const selection = currentEditorState.getSelection();
-        const newContentState = Modifier.replaceText(
-          contentState,
-          selection.merge({
-            anchorOffset: 0,
-            focusOffset: 3,
-          }),
-          ""
-        );
-        newState = EditorState.push(
-          currentEditorState,
-          newContentState,
-          "remove-range"
-        );
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("HEADING")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "HEADING");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("REDLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("UNDERLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
-        }
-        if (JSON.stringify(newState.getCurrentInlineStyle()).includes("BOLD")) {
-          newState = RichUtils.toggleInlineStyle(newState, "BOLD");
-        }
-
-        newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
+        newState = handleApplyUnderline(currentEditorState);
       } else if (command === "redline") {
-        const contentState = editorState.getCurrentContent();
-        const selection = editorState.getSelection();
-        const newContentState = Modifier.replaceText(
-          contentState,
-          selection.merge({
-            anchorOffset: 0,
-            focusOffset: 3,
-          }),
-          ""
-        );
-        newState = EditorState.push(
-          editorState,
-          newContentState,
-          "remove-range"
-        );
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("HEADING")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "HEADING");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("UNDERLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
-        }
-        if (JSON.stringify(newState.getCurrentInlineStyle()).includes("BOLD")) {
-          newState = RichUtils.toggleInlineStyle(newState, "BOLD");
-        }
-        newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
+        newState = handleApplyRed(currentEditorState);
       } else if (command === "apply-bold") {
-        const contentState = editorState.getCurrentContent();
-        const selection = editorState.getSelection();
-        const newContentState = Modifier.replaceText(
-          contentState,
-          selection.merge({
-            anchorOffset: 0,
-            focusOffset: 2,
-          }),
-          ""
-        );
-        newState = EditorState.push(
-          editorState,
-
-          newContentState,
-          "remove-range"
-        );
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("HEADING")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "HEADING");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("REDLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("UNDERLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
-        }
-        if (JSON.stringify(newState.getCurrentInlineStyle()).includes("BOLD")) {
-          newState = RichUtils.toggleInlineStyle(newState, "BOLD");
-        }
-        newState = RichUtils.toggleInlineStyle(newState, "BOLD");
+        newState = handleApplyBold(currentEditorState);
       } else if (command === "new-line") {
-        const contentState = editorState.getCurrentContent();
-        const selection = editorState.getSelection();
-        const currentBlock = contentState.getBlockForKey(
-          selection.getStartKey()
-        );
-
-        const blockMap = contentState.getBlockMap();
-        const newBlock = currentBlock.merge({
-          text: "",
-          type: "unstyled", // Set the type to unstyled for a new line
-          key: genKey(), // Generate a new key for the new block
-        });
-
-        const newContentState = contentState.merge({
-          blockMap: blockMap.set(newBlock.key, newBlock),
-          selectionAfter: selection.merge({
-            anchorKey: newBlock.key,
-            focusKey: newBlock.key,
-            anchorOffset: 0,
-            focusOffset: 0,
-          }),
-        });
-
-        newState = EditorState.push(
-          editorState,
-          newContentState,
-          "insert-characters"
-        );
-
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("HEADING")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "HEADING");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("REDLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "REDLINE");
-        }
-        if (
-          JSON.stringify(newState.getCurrentInlineStyle()).includes("UNDERLINE")
-        ) {
-          newState = RichUtils.toggleInlineStyle(newState, "UNDERLINE");
-        }
-        if (JSON.stringify(newState.getCurrentInlineStyle()).includes("BOLD")) {
-          newState = RichUtils.toggleInlineStyle(newState, "BOLD");
-        }
+        newState = handleApplyNewLine(currentEditorState);
       }
 
       if (newState) {
